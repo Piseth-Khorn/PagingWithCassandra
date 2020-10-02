@@ -24,36 +24,37 @@ import java.util.UUID;
 public class PeriodController {
     @Autowired
     private PeriodsService periodsService;
+
     @GetMapping
-    public ResponseEntity<List<Periods>> findAll(){
+    public ResponseEntity<List<Periods>> findAll() {
         return ResponseEntity.ok(periodsService.findAll());
     }
+
     @PostMapping
-    public ResponseEntity<List<Periods>> save(@RequestBody Periods periods){
-        int i =0;
+    public ResponseEntity<List<Periods>> save(@RequestBody Periods periods) {
+        int i = 0;
         List<Periods> roleList = new ArrayList<>();
-        while (i<10000) {
-            String generatedString  = RandomStringUtils.random(10,true,true);
+        while (i < 10000) {
+            String generatedString = RandomStringUtils.random(10, true, true);
             periods.setId(i);
-            periods.setEvent_name(generatedString+i);
+            periods.setEvent_name(generatedString + i);
             periods.setPeriod_name(generatedString);
-            periods.setStrong_race(i+generatedString);
-            periods.setWeak_race(i+generatedString+i);
-           roleList.add(periodsService.save(periods));
+            periods.setStrong_race(i + generatedString);
+            periods.setWeak_race(i + generatedString + i);
+            roleList.add(periodsService.save(periods));
             i++;
         }
-       return new ResponseEntity<>(roleList, HttpStatus.CREATED);
+        return new ResponseEntity<>(roleList, HttpStatus.CREATED);
     }
+
     @GetMapping("/page/{int}/{limit}")
-    public ResponseEntity<Slice<Periods>> pages(@PathVariable("int") int init,@PathVariable("limit") int limit){
-        return new ResponseEntity<>(periodsService.paging(init,limit),HttpStatus.ACCEPTED);
+    public ResponseEntity<Slice<Periods>> pages(@PathVariable("int") int init, @PathVariable("limit") int limit) {
+        return new ResponseEntity<>(periodsService.paging(init, limit), HttpStatus.ACCEPTED);
     }
 
     @GetMapping("/pages/{uuid}/{limit}")
-    public ResponseEntity<List<Periods>> getPagingPeriods(@PathVariable("uuid")int uuid,@PathVariable("limit") int limit){
-
-
-        return new ResponseEntity<>(periodsService.customPaging(uuid,limit),HttpStatus.ACCEPTED);
+    public ResponseEntity<List<Periods>> getPagingPeriods(@PathVariable("uuid") int uuid, @PathVariable("limit") int limit) {
+        return new ResponseEntity<>(periodsService.customPaging(uuid, limit), HttpStatus.ACCEPTED);
     }
 
 }

@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface PeriodsRepository extends CassandraRepository<Periods, Integer> {
     @Query("select * from periods where token(id) >= token(?0) limit ?1")
    public List<Periods> page(int uuid,int limit);
+    @Query("select * from periods limit ?0")
+    public List<Periods> defaultPage(int limit);
 }

@@ -39,6 +39,7 @@ public class PeriodsService {
     }
 
     public List<Periods> customPaging(int uuid, int limit) {
+        if (uuid == 0) return periodsRepository.defaultPage(limit);
         return periodsRepository.page(uuid, limit);
     }
 }
