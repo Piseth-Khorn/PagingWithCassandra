@@ -10,9 +10,9 @@ import java.util.UUID;
 
 @Repository
 public interface DocumentRepository extends CassandraRepository<Document, UUID> {
-@Query("SELECT * FROM document WHERE userid = ?0")
-    Document checkDocumentById(User userid);
-@Query("SELECT * FROM document WHERE userid = ?0")
-    String getUploadDocumentPath(UUID uuid);
+@Query("SELECT * FROM document WHERE userid = ?0 ALLOW FILTERING")
+  public Document checkDocumentById(UUID userid);
+@Query("SELECT fileName FROM document WHERE userid = ?0 ALLOW FILTERING")
+   public String getUploadDocumentPath(UUID userid);
 
 }

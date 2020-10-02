@@ -12,7 +12,7 @@ import java.util.UUID;
 public class Document {
     @PrimaryKey
     private UUID documentId;
-    private User userid;
+    private UUID userid;
     private String fileName;
     private String documentType;
     private String documentFormat;
@@ -21,7 +21,7 @@ public class Document {
     public Document() {
     }
 
-    public Document(UUID documentId, User userid, String fileName, String documentType, String documentFormat, String uploadDir) {
+    public Document(UUID documentId, UUID userid, String fileName, String documentType, String documentFormat, String uploadDir) {
         this.documentId = documentId;
         this.userid = userid;
         this.fileName = fileName;
@@ -38,11 +38,11 @@ public class Document {
         this.documentId = documentId;
     }
 
-    public User getUserid() {
+    public UUID getUserid() {
         return userid;
     }
 
-    public void setUserid(User userid) {
+    public void setUserid(UUID userid) {
         this.userid = userid;
     }
 

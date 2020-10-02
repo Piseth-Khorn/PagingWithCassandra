@@ -20,10 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class DocumentService {
@@ -43,7 +40,7 @@ public class DocumentService {
     public Map<String,Object> storeFile(MultipartFile file, User user) throws DocumentStorageException {
     Map<String,Object> result = new HashMap<>();
     //Normalize file name
-    String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
+    String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
     String fileName ="";
     try {
     // Check if the file's name contains invalid characters
@@ -56,29 +53,31 @@ public class DocumentService {
     }catch (Exception e){
     fileExtension = "";
     }
-    fileName =new Date()+"_"+ user.getId()+"_"+user.getFirstname()+"_"+user.getLastname() +fileExtension;
+    fileName = user.getId()+"_"+user.getFirstName()+"_"+user.getLastName() +fileExtension;
     // Copy file to the target location (Replacing existing file with the same name)
     Path targetLocation = this.fileStorageLocation.resolve(fileName);
     Files.copy(file.getInputStream(),targetLocation, StandardCopyOption.REPLACE_EXISTING);
-    Document document = documentRepository.checkDocumentById(user);
+    Document document = documentRepository.checkDocumentById(user.getId());
     if (document != null){
         document.setDocumentFormat(file.getContentType());
         document.setFileName(fileName);
         result.put("doc",documentRepository.save(document));
     }else{
         Document newDoc = new Document();
+        newDoc.setUserid(user.getId());
         newDoc.setDocumentId(Uuids.timeBased());
         newDoc.setFileName(fileName);
         newDoc.setDocumentFormat(file.getContentType());
         newDoc.setDocumentType(user.getFile());
         result.put("doc",documentRepository.save(newDoc));
     }
-    result.put("fileName",fileName);
+    result.put("filename",fileName);
     return result;
     }catch ( IOException | DocumentStorageException ex ){
         throw new DocumentStorageException("Could not store file " + fileName + ". Please try again!", ex);
     }
     }
+
     public Resource loadFileResource(String filename) throws Exception {
         try{
             Path filePath = this.fileStorageLocation.resolve(filename).normalize();
@@ -93,7 +92,6 @@ public class DocumentService {
         }
     }
     public String getDocumentName(UUID userId) {
-
         return documentRepository.getUploadDocumentPath(userId);
 
     }
