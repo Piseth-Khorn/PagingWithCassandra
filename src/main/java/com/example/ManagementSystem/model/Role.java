@@ -1,6 +1,9 @@
 package com.example.ManagementSystem.model;
 
+import org.springframework.data.cassandra.core.cql.Ordering;
+import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
+import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.core.mapping.Table;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -12,8 +15,9 @@ import java.util.UUID;
 
 @Table
 public class Role {
-    @PrimaryKey
+    @PrimaryKeyColumn(type = PrimaryKeyType.PARTITIONED,ordinal = 0)
     private UUID id;
+    @PrimaryKeyColumn(type = PrimaryKeyType.CLUSTERED,ordering = Ordering.DESCENDING, ordinal = 1)
     private String name;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date createDate = new Date();

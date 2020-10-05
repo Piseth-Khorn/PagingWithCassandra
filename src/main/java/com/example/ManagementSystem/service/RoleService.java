@@ -35,4 +35,11 @@ public class RoleService {
     public void destroy(UUID uuid) {
         roleRepository.deleteById(uuid);
     }
+    public List<Role> pagination(String uuid, int limit){
+        if (uuid.isEmpty())return roleRepository.getDefaultPage(limit);
+        return roleRepository.getPage(UUID.fromString(uuid),limit);
+    }
+    public Long countRole(){
+        return roleRepository.countRole();
+    }
 }

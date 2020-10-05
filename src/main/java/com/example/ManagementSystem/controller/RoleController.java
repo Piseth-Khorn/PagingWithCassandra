@@ -11,10 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @CrossOrigin
 @RestController
@@ -32,7 +29,7 @@ public class RoleController {
         return role.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
     }
-    @GetMapping("/page")
+    @GetMapping("/page/{d}")
     public ResponseEntity<Slice<Role>> paging(){
         return new ResponseEntity<>(roleService.Paging(),HttpStatus.ACCEPTED);
     }
@@ -49,7 +46,7 @@ public class RoleController {
             int i = 1;
             List<Role>role1 = new ArrayList<>();
             int lenth= 10;
-            while (i<200000) {
+            while (i<2000) {
                 String genderatedString = RandomStringUtils.random(lenth, true, true);
                 role.setId(Uuids.timeBased());
                 role.setName(genderatedString);
@@ -73,13 +70,25 @@ public class RoleController {
 
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteById(@PathVariable("id") UUID uuid){
+    public ResponseEntity<HttpStatus> deleteById(@PathVariable("id") UUID uuid) {
         try {
             roleService.destroy(uuid);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+    @GetMapping("/page")
+    public ResponseEntity<Map<String,Object>> getPagination(@RequestParam(value = "pageSize",required = false) int limit,@RequestParam(value = "pageNumber",required = false) String uuid){
+        System.out.println(uuid+" "+limit);
+        HashMap<String,Object> map = new HashMap<>();
+        map.put("payload",roleService.pagination(uuid,limit));
+    return new ResponseEntity<>(map,HttpStatus.ACCEPTED);
+    }
+    @GetMapping("/count")
+    public ResponseEntity<Map<String,Object>> roleCount(){
+        Map<String,Object> map = new HashMap<>();
+        map.put("rowCount",roleService.countRole());
+        return new ResponseEntity<>(map,HttpStatus.ACCEPTED);
+    }
 }

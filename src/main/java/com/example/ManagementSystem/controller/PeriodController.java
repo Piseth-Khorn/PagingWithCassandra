@@ -47,10 +47,10 @@ public class PeriodController {
         return new ResponseEntity<>(roleList, HttpStatus.CREATED);
     }
 
-    @GetMapping("/page/{int}/{limit}")
-    public ResponseEntity<Slice<Periods>> pages(@PathVariable("int") int init, @PathVariable("limit") int limit) {
-        return new ResponseEntity<>(periodsService.paging(init, limit), HttpStatus.ACCEPTED);
-    }
+//    @GetMapping("/page/{int}/{limit}")
+//    public ResponseEntity<Slice<Periods>> pages(@PathVariable("int") int init, @PathVariable("limit") int limit) {
+//        return new ResponseEntity<>(periodsService.paging(init, limit), HttpStatus.ACCEPTED);
+//    }
 
     @GetMapping("/pages/{uuid}/{limit}")
     public ResponseEntity<List<Periods>> getPagingPeriods(@PathVariable("uuid") int uuid, @PathVariable("limit") int limit) {

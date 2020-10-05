@@ -4,6 +4,7 @@ import com.example.ManagementSystem.model.Periods;
 import com.example.ManagementSystem.repositories.PeriodsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.cassandra.core.query.CassandraPageRequest;
+import org.springframework.data.cassandra.repository.Query;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -22,13 +23,13 @@ public class PeriodsService {
     private static final String SORT_FIELD = "test_name";
     @Autowired
     private PeriodsRepository periodsRepository;
-
-    public Slice<Periods> paging(int pageSize, int cursorMark) {
-
-        Slice<Periods> firstBatch = periodsRepository.findAll(CassandraPageRequest.first(pageSize));
-        assertThat(firstBatch).hasSize(cursorMark);
-        return periodsRepository.findAll(firstBatch.nextPageable());
-    }
+//    public Slice<Periods> paging(int pageSize, int cursorMark) {
+//        Pageable pageable = CassandraPageRequest.of(PageRequest.of(0, 10,
+//                Sort.by(Sort.Direction.DESC, SORT_FIELD)), DEFAULT_CURSOR_MARK.equalsIgnoreCase(testRequest.getCursorMark()) ? null : PagingState.fromString(testRequest.getCursorMark()));
+//        Slice<Periods> firstBatch = periodsRepository.findAll(CassandraPageRequest.of(0,10));
+//        //assertThat(firstBatch).hasSize(cursorMark);
+//        return periodsRepository.findAll(firstBatch.nextPageable());
+//    }
 
     public List<Periods> findAll() {
         return periodsRepository.findAll();
