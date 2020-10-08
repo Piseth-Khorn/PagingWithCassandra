@@ -1,6 +1,8 @@
 package com.example.ManagementSystem.controller;
 
 import com.datastax.oss.driver.api.core.uuid.Uuids;
+import com.example.ManagementSystem.dto.CassandraPage;
+import com.example.ManagementSystem.dto.GetPeriodsPageDTO;
 import com.example.ManagementSystem.model.Periods;
 import com.example.ManagementSystem.model.Role;
 import com.example.ManagementSystem.service.PeriodsService;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.swing.plaf.SliderUI;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -47,14 +50,18 @@ public class PeriodController {
         return new ResponseEntity<>(roleList, HttpStatus.CREATED);
     }
 
-//    @GetMapping("/page/{int}/{limit}")
-//    public ResponseEntity<Slice<Periods>> pages(@PathVariable("int") int init, @PathVariable("limit") int limit) {
-//        return new ResponseEntity<>(periodsService.paging(init, limit), HttpStatus.ACCEPTED);
-//    }
+    @GetMapping("/page/{int}/{limit}")
+    public ResponseEntity<Slice<Periods>> pages(@PathVariable("int") int init, @PathVariable("limit") int limit) {
+        return new ResponseEntity<>(periodsService.paging(init, limit), HttpStatus.ACCEPTED);
+    }
 
     @GetMapping("/pages/{uuid}/{limit}")
     public ResponseEntity<List<Periods>> getPagingPeriods(@PathVariable("uuid") int uuid, @PathVariable("limit") int limit) {
         return new ResponseEntity<>(periodsService.customPaging(uuid, limit), HttpStatus.ACCEPTED);
+    }
+    @GetMapping("/{limit}")
+    public ResponseEntity<List<Periods>> getSort(@PathVariable("limit") int limit){
+        return new ResponseEntity<>(periodsService.getSort(limit),HttpStatus.ACCEPTED);
     }
 
 }

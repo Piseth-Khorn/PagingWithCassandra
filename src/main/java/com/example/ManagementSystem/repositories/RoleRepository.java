@@ -17,9 +17,9 @@ public interface RoleRepository extends CassandraRepository<Role, UUID> {
     @Query("select * from role limit ?0")
     public List<Role> getDefaultPage(int limit);
     @Query("select * from role where token(id) > token(?0) limit ?1")
-    public List<Role> getPage(UUID uuid, int limit);
-    @Query("select count(id) from role limit 10000")
+    public List<Role> nextPage(UUID uuid, int limit);
+    @Query("select count(1) from role")
     public Long countRole();
-
-
+    @Query("select * from role where token(id) < token(?0)")
+    public List<Role> previousPage(UUID uuid);
 }
