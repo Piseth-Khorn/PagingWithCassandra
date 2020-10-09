@@ -1,13 +1,11 @@
 package com.example.ManagementSystem.controller;
 
 import com.datastax.oss.driver.api.core.uuid.Uuids;
-import com.example.ManagementSystem.dto.CassandraPage;
+import com.example.ManagementSystem.dto.CassandraPageSet;
 import com.example.ManagementSystem.model.Role;
 import com.example.ManagementSystem.service.RoleService;
 import org.apache.commons.lang.RandomStringUtils;
-import org.assertj.core.internal.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jms.JmsProperties;
 import org.springframework.data.cassandra.core.query.CassandraPageRequest;
 
 import org.springframework.data.cassandra.core.query.Query;
@@ -22,6 +20,9 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/role")
 public class RoleController {
+    private List<CassandraPageSet> objectList = new ArrayList<>();
+    private int currentIndex = 0;
+    private Map<Integer, String> objectMap = new HashMap<Integer, String>();
     @Autowired
     private RoleService roleService;
 
@@ -93,16 +94,41 @@ public class RoleController {
 
     @GetMapping("/page")
     public ResponseEntity<Map<String, Object>> getPagination(
-            @RequestParam(value = "filter",required = false) String filter,
-            @RequestParam(value = "sortOrder",required = false) String sortOrder,
+            @RequestParam(value = "filter", required = false) String filter,
+            @RequestParam(value = "sortOrder", required = false) String sortOrder,
             @RequestParam(value = "pageSize", required = false) int limit,
             @RequestParam(value = "condition", required = false) int condition,
+            @RequestParam(value = "pageIndex", required = false) int pageIndex,
             @RequestParam("tokenId") String uuid) {
-        System.out.println(filter+"  "+sortOrder+"  "+limit+"  "+condition+"  "+uuid);
+        // System.out.println(filter + "  " + sortOrder + "  " + limit + "  " + uuid + "   " + pageIndex);
         HashMap<String, Object> map = new HashMap<>();
-        if (condition == 1)
-            map.put("payload", roleService.getNextPage(uuid, limit));
-        else map.put("payload", roleService.getPreviousPage(uuid, limit));
+
+        if (pageIndex > currentIndex) {
+            objectList.add(new CassandraPageSet(pageIndex, limit, uuid));
+            System.out.println(objectList.toString());
+        } else {
+            System.out.println(objectList.toString());
+            if (!objectList.isEmpty())
+                objectList.remove(objectList.size() - 1);
+
+            if (!objectList.isEmpty())
+                uuid = objectList.get(objectList.size() - 1).getUuid();
+            for (CassandraPageSet cassandraPageSet : objectList) {
+                if (limit * pageIndex == cassandraPageSet.getLimit() * cassandraPageSet.getPageIndex()) {
+                    uuid = cassandraPageSet.getUuid();
+                   // System.out.println("hello");
+                }
+               // System.out.println(cassandraPageSet.toString());
+            }
+            System.out.println(objectList.toString());
+        }
+        currentIndex = pageIndex;
+        if (pageIndex == 0) objectList.clear();
+
+        map.put("payload", roleService.getNextPage(uuid, limit));
+//        if (condition == 1)
+//            map.put("payload", roleService.getNextPage(uuid, limit));
+//        else map.put("payload", roleService.getPreviousPage(uuid, limit));
         return new ResponseEntity<>(map, HttpStatus.ACCEPTED);
     }
 
@@ -112,10 +138,10 @@ public class RoleController {
         map.put("rowCount", roleService.countRole());
         return new ResponseEntity<>(map, HttpStatus.ACCEPTED);
     }
-    @GetMapping("/dd")
-    public ResponseEntity<Slice<Role>> test(){
-       Query query = Query.empty().pageRequest((CassandraPageRequest.first(10)));
 
+    @GetMapping("/dd")
+    public ResponseEntity<Slice<Role>> test() {
+        Query query = Query.empty().pageRequest((CassandraPageRequest.first(10)));
 
 
         return new ResponseEntity<>(HttpStatus.ACCEPTED);

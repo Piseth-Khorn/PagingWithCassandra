@@ -18,6 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RoleService {
     static final String underfunded = "undefined";
     static final String Ordering = "asc";
+    private List<Role> objectList = new ArrayList<>();
+    private Map<String, Object> objectMap = new HashMap<>();
     @Autowired
     private RoleRepository roleRepository;
 
@@ -46,7 +48,7 @@ public class RoleService {
     }
 
     public List<Role> getNextPage(String uuid, int limit) {
-
+        System.out.println(uuid);
         if (uuid.isEmpty() || uuid.equals(underfunded)) {
 
             return roleRepository.getDefaultPage(limit);
