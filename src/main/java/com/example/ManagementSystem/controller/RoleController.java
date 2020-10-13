@@ -20,6 +20,12 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/role")
 public class RoleController {
+    private int aBoolean;
+
+    {
+        aBoolean = 0;
+    }
+
     private List<CassandraPageSet> objectList = new ArrayList<>();
     private int currentIndex = 0;
     private Map<Integer, String> objectMap = new HashMap<Integer, String>();
@@ -102,33 +108,36 @@ public class RoleController {
             @RequestParam("tokenId") String uuid) {
         // System.out.println(filter + "  " + sortOrder + "  " + limit + "  " + uuid + "   " + pageIndex);
         HashMap<String, Object> map = new HashMap<>();
-
+        aBoolean = 1;
         if (pageIndex > currentIndex) {
             objectList.add(new CassandraPageSet(pageIndex, limit, uuid));
             System.out.println(objectList.toString());
         } else {
+            System.out.println(objectList.size());
+            if (!objectList.isEmpty() && objectList.size() > 1)
+                uuid = objectList.get(objectList.size() - 2).getUuid();
             System.out.println(objectList.toString());
-            if (!objectList.isEmpty())
-                objectList.remove(objectList.size() - 1);
-
-            if (!objectList.isEmpty())
-                uuid = objectList.get(objectList.size() - 1).getUuid();
             for (CassandraPageSet cassandraPageSet : objectList) {
                 if (limit * pageIndex == cassandraPageSet.getLimit() * cassandraPageSet.getPageIndex()) {
                     uuid = cassandraPageSet.getUuid();
-                   // System.out.println("hello");
+                    aBoolean = 0;
                 }
-               // System.out.println(cassandraPageSet.toString());
+
             }
+        if (aBoolean == 1) {
+            System.out.println("hi");
+            if (!objectList.isEmpty())
+                objectList.remove(objectList.size() - 1);
+
+        }
             System.out.println(objectList.toString());
         }
         currentIndex = pageIndex;
-        if (pageIndex == 0) objectList.clear();
-
+        if (pageIndex == 0) {
+            objectList.clear();
+            uuid = "";
+        }
         map.put("payload", roleService.getNextPage(uuid, limit));
-//        if (condition == 1)
-//            map.put("payload", roleService.getNextPage(uuid, limit));
-//        else map.put("payload", roleService.getPreviousPage(uuid, limit));
         return new ResponseEntity<>(map, HttpStatus.ACCEPTED);
     }
 

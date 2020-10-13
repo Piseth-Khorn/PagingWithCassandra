@@ -1,5 +1,8 @@
 package com.example.ManagementSystem;
 
+
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Session;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

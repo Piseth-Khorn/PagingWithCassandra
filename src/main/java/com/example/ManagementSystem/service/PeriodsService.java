@@ -1,17 +1,17 @@
 package com.example.ManagementSystem.service;
 
-import com.example.ManagementSystem.dto.CassandraPage;
+import com.datastax.driver.core.*;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
+import com.datastax.driver.core.querybuilder.Select;
+import com.datastax.oss.driver.api.core.paging.OffsetPager;
 import com.example.ManagementSystem.model.Periods;
-import com.example.ManagementSystem.model.Role;
 import com.example.ManagementSystem.repositories.PeriodsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.cassandra.core.cql.CqlTemplate;
 import org.springframework.data.cassandra.core.query.CassandraPageRequest;
-import com.datastax.driver.core.PagingState;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 
 import java.util.*;
@@ -25,10 +25,16 @@ public class PeriodsService {
     private static final String SORT_FIELD = "test_name";
     @Autowired
     private PeriodsRepository periodsRepository;
+//    @Autowired
+//    private CqlTemplate cqlTemplate;
+
+    public PeriodsService() {
+    }
+
     public Slice<Periods> paging(int pageSize, int limit) {
         Slice<Periods> firstBatch = periodsRepository.findAll(CassandraPageRequest.first(limit));
         assertThat(firstBatch).hasSize(limit);
-       // return firstBatch;
+        // return firstBatch;
         return periodsRepository.findAll(firstBatch.nextPageable());
     }
 
@@ -42,20 +48,37 @@ public class PeriodsService {
 
     public List<Periods> customPaging(int uuid, int limit) {
         if (uuid == 0) return periodsRepository.defaultPage(limit);
-        List<Periods>periodsList = periodsRepository.page(uuid);
-        List<Periods>periodsPage= new ArrayList<>();
+        List<Periods> periodsList = periodsRepository.page(uuid);
+        List<Periods> periodsPage = new ArrayList<>();
         Collections.reverse(periodsList);
         for (int i = 0; i < limit; i++) {
-            if(i>=periodsList.size())break;
+            if (i >= periodsList.size()) break;
             periodsPage.add(periodsList.get(i));
         }
         return periodsPage;
     }
 
-    public List<Periods> getSort(int limit){
+    public List<Periods> getSort(int limit) {
         List<Periods> periodsList = periodsRepository.defaultPage(limit);
-       periodsList.sort(Comparator.comparing(Periods::getEvent_name));
+        periodsList.sort(Comparator.comparing(Periods::getEvent_name));
         System.out.println(periodsList.toString());
-       return periodsList;
+        return periodsList;
     }
+
+
+
+    public Slice<Periods> getDD(){
+
+    Slice<Periods> slice = periodsRepository.findAll(CassandraPageRequest.first(10));
+    do {
+        if(slice.hasNext())
+            slice = periodsRepository.findAll(slice.nextPageable());
+        else break;
+    }while (!slice.getContent().isEmpty());
+        assertThat(slice).hasSize(10);
+        assertThat(slice.iterator()).isEqualTo(10);
+
+        return null;
+    }
+
 }
